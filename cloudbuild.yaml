@@ -1,5 +1,5 @@
 steps:
-  # Step 1: Initialize and plan Terraform
+  # Step 1: Initialize and plan Terraform change
   - id: 'terraform init'
     name: 'hashicorp/terraform:1.0.0'
     entrypoint: 'sh'
