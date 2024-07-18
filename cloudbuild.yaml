@@ -18,13 +18,13 @@ steps:
       - |
         terraform plan
 
- - id: 'terraform apply'
-    name: 'hashicorp/terraform:1.0.0'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        terraform apply
+  - id: 'terraform apply'
+      name: 'hashicorp/terraform:1.0.0'
+      entrypoint: 'sh'
+      args:
+        - '-c'
+        - |
+          terraform apply
   
   # Step 3: Deploy Docker image to existing VM
   - name: 'gcr.io/cloud-builders/gcloud'
