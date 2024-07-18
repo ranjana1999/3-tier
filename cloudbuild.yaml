@@ -1,54 +1,22 @@
 steps:
-  # Step 0: Print current directory
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        pwd &&
-        ls
-
-  # Step 1: Initialize and plan Terraform change
-  - id: 'terraform init'
-    name: 'hashicorp/terraform:1.0.0'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        pwd &&
-        cd Terraform &&
-        ls &&
-        terraform init 
-
-  # Step 2: Apply Terraform changes
-  - id: 'terraform plan'
-    name: 'hashicorp/terraform:1.0.0'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        terraform plan
-
-  # Step 3: Apply Terraform changes
-  - id: 'terraform apply'
-    name: 'hashicorp/terraform:1.0.0'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        terraform apply
-  
-  # Step 4: Deploy Docker image to existing VM
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        # Get the external IP of the VM (adjust this according to your Terraform output)
-        VM_IP=$(terraform output -json | jq -r '.vm_external_ip.value')
-
-        # SSH into the VM and deploy Docker image
-        gcloud compute ssh my-instance --zone=us-central1-a --command="sudo docker pull us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest && sudo docker run -d -p 80:80 us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest"
-
+- name: 'gcr.io/cloudbuild-templates/terraform-init'
+  entrypoint: 'terraform'
+  args: ['init']
+- name: 'gcr.io/cloudbuild-templates/terraform-fmt'
+  entrypoint: 'terraform'
+  args: ['fmt']
+- name: 'gcr.io/cloudbuild-templates/terraform-plan'
+  entrypoint: 'terraform'
+  args: ['plan']
+- name: 'gcr.io/cloudbuild-templates/terraform-apply'
+  entrypoint: 'terraform'
+  args: ['apply', '-auto-approve']
+- name: 'gcr.io/cloudbuilders/docker'
+  args: ['-t', 'us-docker.pkg.dev/your-project-id/your-repo/your-image:latest', '.']
+  volumes:
+  - name: 'cache'
+    path: '/root/.cache'
+- name: 'gcr.io/cloudbuilders/gcloud'
+  args: ['compute', 'ssh', 'my-vm', '--zone', 'us-central1-a', '--command', 'docker', 'run', '-d', '-p', '8080:80', 'us-docker.pkg.dev/your-project-id/your-repo/your-image:latest']
 options:
   logging: CLOUD_LOGGING_ONLY
