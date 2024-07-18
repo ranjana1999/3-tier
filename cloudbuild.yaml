@@ -5,7 +5,8 @@ steps:
     args:
       - '-c'
       - |
-        pwd
+        pwd &&
+        ls
 
   # Step 1: Initialize and plan Terraform change
   - id: 'terraform init'
