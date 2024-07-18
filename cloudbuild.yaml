@@ -18,6 +18,8 @@ steps:
       - '-c'
       - |
         ls &&
+        cd Terraform &&
+        ls &&
         terraform apply -input=false -auto-approve 
          
 options:
