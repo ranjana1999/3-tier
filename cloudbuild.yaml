@@ -1,20 +1,24 @@
 steps:
-- name: 'gcr.io/cloudbuild-templates/terraform-init'
-  entrypoint: 'terraform'
-  args: ['init']
-- name: 'gcr.io/cloudbuild-templates/terraform-fmt'
-  entrypoint: 'terraform'
-  args: ['fmt']
-- name: 'gcr.io/cloudbuild-templates/terraform-plan'
-  entrypoint: 'terraform'
-  args: ['plan']
-- name: 'gcr.io/cloudbuild-templates/terraform-apply'
-  entrypoint: 'terraform'
-  args: ['apply', '-auto-approve']
-- name: 'gcr.io/cloudbuilders/docker'
-  args: ['-t', 'us-docker.pkg.dev/your-project-id/your-repo/your-image:latest', '.']
-- name: 'gcr.io/cloudbuilders/gcloud'
-  args: ['compute', 'ssh', 'my-vm', '--zone', 'us-central1-a', '--command', 'docker', 'run', '-d', '-p', '8080:80', 'us-docker.pkg.dev/your-project-id/your-repo/your-image:latest']
+  # Step 3: Set up Terraform environment and run terraform plan
+  - name: 'hashicorp/terraform:light'
+    entrypoint: '/bin/sh'
+    args:
+      - '-c'
+      - |
+        ls &&
+        cd terraform &&
+        ls &&
+        terraform init -input=false &&
+        terraform plan -input=false 
+
+
+  - name: hashicorp/terraform:light
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        cd terraform &&
+        terraform apply -input=false -auto-approve 
+         
 options:
   logging: CLOUD_LOGGING_ONLY
-
