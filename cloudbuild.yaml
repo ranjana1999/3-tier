@@ -13,7 +13,7 @@ steps:
         terraform plan -input=false
 
   # Step 4: Terraform apply (provision infrastructure)
-  - name: 'hashicorp/terraform:latest'
+  - name: 'hashicorp/terraform:light'
     entrypoint: 'bash'
     args:
       - '-c'
