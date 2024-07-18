@@ -16,6 +16,11 @@ resource "google_compute_instance" "vm_instance_new" {
     }
   }
   metadata_startup_script = file("startup-script.sh")
+  metadata = {
+    "ssh-keys" = <<EOF
+      c3ranjanacloud:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKF1blWO311QlZT9ih+D+iAu/r2TxyvhxPx1Q6om9R4A c3ranjanacloud
+    EOF
+  }
 }
 
 output "vm_external_ip" {

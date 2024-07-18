@@ -1,6 +1,7 @@
 steps:
-  # Step 3: Set up Terraform environment and run terraform plan
+  # Step 1: Set up Terraform environment and run terraform plan
   - name: 'hashicorp/terraform:light'
+    id: 'terraform-plan'
     entrypoint: '/bin/sh'
     args:
       - '-c'
@@ -11,9 +12,10 @@ steps:
         terraform init -input=false &&
         terraform plan -input=false 
 
-
-  - name: hashicorp/terraform:light
-    entrypoint: /bin/sh
+  # Step 2: Apply Terraform configuration
+  - name: 'hashicorp/terraform:light'
+    id: 'terraform-apply'
+    entrypoint: '/bin/sh'
     args:
       - '-c'
       - |
@@ -21,13 +23,41 @@ steps:
         cd Terraform &&
         ls &&
         terraform apply -input=false -auto-approve 
-    # Step 3: Pull Docker image from Artifact Registry
+
+  # Step 3: Authenticate Docker with Google Cloud
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'docker-auth'
+    entrypoint: '/bin/sh'
+    args:
+      - '-c'
+      - |
+        gcloud auth configure-docker
+
+  # Step 4: Pull Docker image from Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-pull'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         docker pull us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest
-         
+  
+  # Step 5: SSH into the VM and run the container
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-container'
+    waitFor: ['terraform-apply']  # Wait for Terraform apply step to finish
+    args:
+      - 'compute'
+      - 'ssh'
+      - '--zone'
+      - 'us-central1-a'
+      - '--project'
+      - '$PROJECT_ID'
+      - '--user'
+      - 'c3ranjanacloud'
+      - '--command'
+      - |
+        sudo docker run -d -p 8080:80 us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest
+
 options:
   logging: CLOUD_LOGGING_ONLY
