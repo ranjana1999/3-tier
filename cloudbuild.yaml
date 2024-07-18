@@ -1,12 +1,33 @@
 steps:
-  - id: 'terraform init'
-    name: 'hashicorp/terraform:1.0.0'
-    script: terraform init
-  - id: 'terraform plan'
-    name: 'hashicorp/terraform:1.0.0'
-    script: terraform plan
-  - id: 'terraform apply'
-    name: 'hashicorp/terraform:1.0.0'
-    script: terraform apply --auto-approve
+  # Step 1: Initialize and plan Terraform
+  - name: 'hashicorp/terraform:light'
+    entrypoint: '/bin/sh'
+    args:
+      - '-c'
+      - |
+        cd Terraform &&
+        terraform init -input=false &&
+        terraform plan -input=false -out=tfplan
+
+  # Step 2: Apply Terraform changes
+  - name: 'hashicorp/terraform:light'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        terraform apply -auto-approve tfplan
+
+  # Step 3: Deploy Docker image to existing VM
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Get the external IP of the VM (adjust this according to your Terraform output)
+        VM_IP=$(terraform output -json | jq -r '.vm_external_ip.value')
+
+        # SSH into the VM and deploy Docker image
+        gcloud compute ssh my-instance --zone=us-central1-a --command="sudo docker pull us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest && sudo docker run -d -p 80:80 us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest"
+
 options:
   logging: CLOUD_LOGGING_ONLY
