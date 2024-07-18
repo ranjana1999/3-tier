@@ -12,7 +12,7 @@ resource "google_compute_instance" "vm_instance_new" {
   network_interface {
     network = "default"
     access_config {
-      // Ephemeral IP will be automatically assigned
+      // Ephemeral IP will be automatically assigned to vm
     }
   }
 }
