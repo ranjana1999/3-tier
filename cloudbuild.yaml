@@ -21,6 +21,25 @@ steps:
         cd Terraform &&
         ls &&
         terraform apply -input=false -auto-approve 
+    # Step 3: Pull Docker image from Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker pull us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest
+
+  # Step 4: Deploy Docker image to existing VM
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Get the external IP of the VM (adjust this according to your Terraform output)
+        VM_IP=$(terraform output -json | jq -r '.vm_external_ip.value')
+
+        # SSH into the VM and deploy Docker image
+        gcloud compute ssh my-vm-instance --zone=us-central1-a --command="sudo docker pull us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest && sudo docker run -d -p 80:80 us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend:latest"
          
 options:
   logging: CLOUD_LOGGING_ONLY
