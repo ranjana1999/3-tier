@@ -1,22 +1,31 @@
 steps:
   # Step 1: Initialize and plan Terraform
-  - name: 'hashicorp/terraform:light'
-    entrypoint: '/bin/sh'
+  - id: 'terraform init'
+    name: 'hashicorp/terraform:1.0.0'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
         cd Terraform &&
-        terraform init -input=false &&
-        terraform plan -input=false -out=tfplan
+        terraform init 
 
   # Step 2: Apply Terraform changes
-  - name: 'hashicorp/terraform:light'
-    entrypoint: '/bin/sh'
+  - id: 'terraform plan'
+    name: 'hashicorp/terraform:1.0.0'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
-        terraform apply -auto-approve tfplan
+        terraform plan
 
+ - id: 'terraform apply'
+    name: 'hashicorp/terraform:1.0.0'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        terraform apply
+  
   # Step 3: Deploy Docker image to existing VM
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
