@@ -17,7 +17,6 @@ steps:
     args:
       - '-c'
       - |
-        cd terraform &&
         terraform apply -input=false -auto-approve 
          
 options:
