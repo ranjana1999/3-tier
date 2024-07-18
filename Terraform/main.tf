@@ -15,6 +15,7 @@ resource "google_compute_instance" "vm_instance_new" {
       // Ephemeral IP will be automatically assigned to vm
     }
   }
+  metadata_startup_script = file("startup-script.sh")
 }
 
 output "vm_external_ip" {
