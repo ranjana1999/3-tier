@@ -20,3 +20,6 @@ steps:
   args: ['compute', 'ssh', 'my-vm', '--zone', 'us-central1-a', '--command', 'docker', 'run', '-d', '-p', '8080:80', 'us-docker.pkg.dev/your-project-id/your-repo/your-image:latest']
 options:
   logging: CLOUD_LOGGING_ONLY
+volumes:
+- name: 'cache'
+  path: '/root/.cache'
