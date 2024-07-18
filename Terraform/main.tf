@@ -1,7 +1,3 @@
-provider "google" {
-  project = "my-project-57732-v"
-  region  = "us-central1"
-}
 
 resource "google_compute_instance" "vm_instance" {
   name         = "my-vm-instance"
