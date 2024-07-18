@@ -3,13 +3,14 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['pull', 'us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend']
 
-  - name: 'hashicorp/terraform:latest'
-    entrypoint: 'bash'
+  - name: 'hashicorp/terraform:light'
+    entrypoint: '/bin/sh'
     args:
       - '-c'
       - |
-        cd infrastructure
-        terraform init
+        cd terraform &&
+        terraform init -input=false &&
+        terraform plan -input=false
 
   # Step 4: Terraform apply (provision infrastructure)
   - name: 'hashicorp/terraform:latest'
