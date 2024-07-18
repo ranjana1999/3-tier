@@ -1,4 +1,3 @@
-
 resource "google_compute_instance" "vm_instance" {
   name         = "my-vm-instance"
   machine_type = "e2-medium"
