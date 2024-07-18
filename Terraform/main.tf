@@ -12,14 +12,11 @@ resource "google_compute_instance" "vm_instance_new" {
   network_interface {
     network = "default"
     access_config {
-      // Ephemeral IP
+      // Ephemeral IP will be automatically assigned
     }
   }
-
 }
+
 output "vm_external_ip" {
-  value = google_compute_instance.instance.network_interface.0.access_config.0.nat_ip
+  value = google_compute_instance.vm_instance_new.network_interface[0].access_config[0].nat_ip
 }
-
-
-
