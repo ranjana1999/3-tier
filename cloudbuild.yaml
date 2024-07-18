@@ -3,21 +3,6 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['pull', 'us-central1-docker.pkg.dev/my-project-57732-v/three-tier/frontend']
 
-  # Step 2: Set up Terraform (optional: if not already installed)
-  - name: 'hashicorp/terraform:latest'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        terraform --version || true
-        if [ ! -f /usr/local/bin/terraform ]; then
-          mkdir -p /tmp/tf && cd /tmp/tf
-          wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip
-          unzip terraform_1.0.8_linux_amd64.zip
-          mv terraform /usr/local/bin/
-        fi
-
-  # Step 3: Terraform initialize (backend config, etc.)
   - name: 'hashicorp/terraform:latest'
     entrypoint: 'bash'
     args:
