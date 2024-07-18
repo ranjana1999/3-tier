@@ -12,35 +12,5 @@ steps:
         terraform init -input=false &&
         terraform plan -input=false
 
-  # Step 4: Terraform apply (provision infrastructure)
-  - name: 'hashicorp/terraform:light'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        terraform apply -auto-approve
-
-  # Step 5: Deploy Docker image to VM (replace with your deployment script)
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args:
-      - 'compute'
-      - 'instances'
-      - 'create-with-container'
-      - 'my-instance'
-      - '--zone=us-central1-a'
-      - '--container-image=us-central1-docker.pkg.dev/my-project-57732-v/my-repo/frontend:latest'
-      - '--machine-type=n1-standard-1'
-      - '--tags=http-server'
-      - '--scopes=https://www.googleapis.com/auth/cloud-platform'
-      - '--metadata=startup-script=sudo docker run -d -p 80:80 us-central1-docker.pkg.dev/my-project-57732-v/my-repo/frontend:latest'
-
-  # Step 6: Cleanup (optional: only if needed)
-  - name: 'hashicorp/terraform:latest'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        cd infrastructure
-        terraform destroy -auto-approve
 options:
   logging: CLOUD_LOGGING_ONLY
