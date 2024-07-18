@@ -57,3 +57,5 @@ steps:
       - |
         cd infrastructure
         terraform destroy -auto-approve
+options:
+  logging: CLOUD_LOGGING_ONLY
